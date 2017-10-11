@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>雪花背景</title>
+	<meta charset="utf-8">
+	<style type="text/css">
+		body{
+			background-color: #000;
+			margin: 0;
+		}
+		canvas{
+			display: block;
+           /*background-color: #fff;*/
+			
+		}
+	</style>
+</head>
+<body>
+<canvas id="canvas" height="500" width="500"></canvas>
+
+<script type="text/javascript">
+	var can=document.getElementById("canvas");
+	var ctx=can.getContext("2d");//设置绘图环境
+	/*//绘制矩形
+	ctx.beiginPath();//开始绘制
+	ctx.strokeRect(100,100,50,50);//绘制空心矩形:x,y:起点 w,h 宽高
+	ctx.beginPath();
+	//圆心坐标：x,y，半径 绘制整圆 逆时针绘制
+	ctx.arc(x,y,r,0,2*Math.PI,false);//设置圆形路径
+	ctx.strokeStyle="blue";
+	ctx.linwidth=10;//线宽
+	ctx.stroke();//绘制空心圆
+	ctx.fillStyle="red";
+	ctx.fill();//填充实心圆*/
+	var w=can.width=window.innerWidth;//获取浏览器的宽并赋值给画布的宽
+	var h=can.height=window.innerHeight;
+	window.onresize=size;
+	function size(){
+	 w=can.width=window.innerWidth;
+	 h=can.height=window.innerHeight;	
+
+	}
+	
+	var sum=1000;//雪花个数
+	var p=[];//用一个数组来存储每个雪花粒子绘制的起始位置
+	for (var i = 0; i < sum; i++) {
+		//push()：往数组里添加东西
+		p.push({
+			x : Math.random()*w,//0-w
+			y : Math.random()*h,
+			r : Math.random()*3//0-3的半径
+		});
+	}
+	function draw(){
+	// 	//1.一个一个圆的绘制
+ //        ctx.fillStyle="#fff";
+ //        for (var i = 0; i < sum; i++) {
+ //        		ctx.beginPath();
+ //        	      ctx.arc(p[i].x,p[i].y,p[i].r,0,2*Math.PI,false);
+ //        	      ctx.closePath();
+ //        	      ctx.fill();
+ //        	    }
+	// }
+	ctx.beginPath();
+	ctx.fillStyle="#ff00ff";
+	//取随机颜色这一部分有误
+	// ctx.fillStyle = "rgba("
+ //                + Math.floor(p.color.r * 255) + ","
+ //                + Math.floor(p.color.g * 255) + ","
+ //                + Math.floor(p.color.b * 255) + ","
+ //                + alpha.toFixed(2) + ")";
+	for (var i = 0; i < sum; i++) {
+		ctx.moveTo(p[i].x,p[i].y);//把绘制的起点移动到x,y
+		 ctx.arc(p[i].x,p[i].y,p[i].r,0,2*Math.PI,false);
+
+		}
+		ctx.fill();
+		 changeY();
+	}
+		draw();
+		function changeY(){
+			for (var i = 0; i < sum; i++) {
+				p[i].y += Math.random()*5;
+				if (p[i].y > h) {
+					p[i].y=0;
+				}
+				}
+		}
+		//函数调用
+		setInterval(function(){
+			ctx.clearRect(0,0,w,h);//清空画布
+			draw();
+		},50);
+</script>
+</body>
+</html>
