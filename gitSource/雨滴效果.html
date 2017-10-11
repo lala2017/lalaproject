@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>雨滴效果</title>
+	<meta charset="utf-8">
+	<style type="text/css">
+		*{
+			margin:0;
+			padding: 0;
+		}
+		html,body{
+			height: 100%;
+		}
+		canvas{
+			width: 100%;
+			height: 100%;
+			background: #000;
+			display: block;
+		}
+	</style>
+</head>
+<body>
+  <canvas id="canvas" width="500" height="500"></canvas>
+  	<script type="text/javascript">
+  		var can=document.getElementById("canvas");
+  		var cxt=can.getContext("2d");
+  		var w=can.width=window.innerWidth;//获取浏览器的宽并赋值给画布的宽
+	    var h=can.height=window.innerHeight;
+		window.onresize=size;
+		function size(){
+		w=can.width=window.innerWidth;
+	 	h=can.height=window.innerHeight;	
+		}
+
+  		// cxt.fillStyle="red";
+  		// cxt.fillRect(100,100,50,50) //坐标，宽高
+  		// var x=100,y=0;
+  	
+  		// function move(){
+  		// 	y++;
+  		// 	cxt.clearRect(0,0,w,h);
+  		// 	cxt.fillRect(x,y,50,50);
+  		// 	requestAnimationFrame(move);
+  		// }
+  			var drops=[];
+	  		function Drop(){}
+  			Drop.prototype={init:function(){
+  				this.x=random(0,w);
+  				this.y=0;
+  				this.vy=random(4,5);
+  				this.l=random(0.8*h,0.9*h);
+  				this.r=1;
+  				this.vr=1;//半径增大的速度
+  				//判断雨滴消失的透明度
+  				this.a=1;
+  				this.va=0.96;//透明度的变化幅度
+  			},
+  		
+  			draw:function(){
+  				if (this.y > this.l) {
+  					cxt.beginPath();
+  					
+  					cxt.arc(this.x,this.y,this.r,0,Math.PI*2,false);
+  					cxt.strokeStyle="rgba(0,255,255,"+this.a+")";
+  					cxt.stroke();
+  				}else{
+  				cxt.fillStyle="rgb(0,255,255)";
+  				cxt.fillRect(this.x,this.y,2,10);
+  				}
+  				
+  				this.update();
+  			},
+  			update:function(){
+
+  				if (this.y<this.l) {
+  					this.y+=this.vy;
+  				}else{
+  					if (this.a>0.03) {
+  						this.r+=this.vr;
+  						if (this.r>50) {this.a*=this.va;}
+  					}else{
+  						//重新初始化雨滴数据
+  						this.init();
+  					}
+  					
+  				}
+  				
+  			}
+
+  	};
+          for(var i=0;i<30;i++){
+          	setTimeout(function(){
+          	 var drop=new Drop();
+          	 drop.init();
+          	drops.push(drop);
+          	},i*300)
+          }
+          function move(){
+          	// cxt.clearRect(0,0,w,h);
+          	cxt.fillStyle="rgba(0,0,0,0.1)";
+          	cxt.fillRect(0,0,w,h);
+          for (var i = 0; i < drops.length; i++) {
+          	drops[i].draw();
+          }
+         
+           }
+           setInterval(function(){
+            requestAnimationFrame(move);
+          },30);
+            
+  		function random(min,max){
+  			return Math.random()*(max-min)+min;
+  		}
+  	</script>
+  
+</body>
+</html>
