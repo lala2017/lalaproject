@@ -1,0 +1,226 @@
+
+<!Doctype>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>点字游戏</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <style media="screen">
+        .wrap {
+            width: 350px;
+            margin:100px auto;
+            border: 1px solid gray;
+            border-radius: 15px;
+            box-shadow: 2px 3px 2px rgb(220, 220, 218) inset;
+        }
+        .top {
+            width: 100%;
+            height: 50px;
+        }
+        .top-left{
+            float: left;
+            margin-left:10px;
+        }
+        .top-right{
+            float: right;
+            margin-right:10px;
+        }
+        h3{
+            text-align: center;
+        }
+        .time {
+            width: 60%;
+            height: 40px;
+            font-size: 2em;
+        }
+        .score {
+            width: 35%;
+            height: 40px;
+            font-size: 2em;
+        }
+
+        .show {
+            width: 100%;
+            height: 100px;
+            font-size: 6em;
+            text-align: center;
+            line-height: 100px;
+            margin: 30px 0;
+        }
+
+        .about {
+            width: 90%;
+            height: 80px;
+            font-size: 14px;
+            margin:10px auto;
+        }
+        .footer:after{
+            clear: both;
+            content: '';
+            display: table;
+            visibility: hidden;
+        }
+        .about div{
+            text-indent: 2em;
+        }
+        .footer {
+            width: 100%;
+        }
+        .footer{
+            font-size: 0;
+        }
+        .footer button{
+            font-size: 35px;
+            height: auto;
+
+            float: left;
+            min-width: 60px;
+            max-width: 60px;
+            display: block;
+            margin: 0;
+            padding: 0;
+            color: inherit;
+            vertical-align: middle;
+            position: relative;
+        }
+        .footer .center{
+            width:300px;
+            margin:10px auto;
+        }
+        .again {
+            width: 100%;
+            height: 50px;
+            font-size: 20px;
+            text-align: center;
+        }
+        .again button{
+            margin:10px auto;
+        }
+        button{
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        @media screen and (max-width: 769px){
+            .wrap{
+                width:100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="top">
+        <div class="top-left"><span>剩余时间：</span><span class="time">60</span><span> s</span></div>
+        <div class="top-right"><span>完成：</span><span class="score">0</span><span> 个</span></div>
+    </div>
+    <div class="show"> 红</div>
+
+    <div class="footer">
+        <div class="center">
+            <button></button>
+            <button></button>
+            <button></button>
+            <button></button>
+            <button></button>
+        </div>
+    </div>
+    <div class="about"><h3>游戏规则</h3><div>根据上面字的颜色从下面选择正确的字，选择正确自动开始</div></div>
+    <div class="again"><button>重新开始</button></div>
+</div>
+<script>
+    var time = document.querySelector('.time');
+    var score = document.querySelector('.score');
+    var show = document.querySelector('.show');
+    var list = document.querySelector(".footer").getElementsByTagName('button');
+    var again = document.querySelector('.again');
+
+    again.onclick = restart;
+    var colors = ['red', 'blue', 'gold', 'green', 'black'];
+    var words = ['红', '蓝', '金', '绿', '黑'];
+    var times = 60;
+    var scores = 0;
+    var colorIndex = 0;
+    var timer;
+    var rands;
+    //随机
+    function rand() {
+        rands = parseInt(Math.random() * 5);//设置一个0到4的变量
+        return rands;
+    }
+    //字体变化 (上面那个大字的随机文字、颜色)
+    function showChange() {
+        colorIndex = rand();
+        var wordIndex = rand();
+        show.innerHTML = words[wordIndex];
+        show.style.color = colors[colorIndex];
+    }
+    showChange();
+    //随机数组(0,1.。4随机出现，并判断是否已经出现过，若没出现过就添加)
+    function arrs() {
+        var arr = [];
+        while (arr.length < words.length) {
+            var ran1 = rand();
+            var bol = true;
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i] == ran1) {
+                    bol = false;
+                    break;
+                }
+            }
+            if (bol) {
+                arr.push(ran1);
+            }
+        }
+        return arr;
+    }
+    //列表改变
+    function listChange() {
+        var ws = arrs();//文字变化
+        var cs = arrs();//颜色变化
+        for (var i = 0; i < list.length; i++) {
+            list[i].innerHTML = words[ws[i]];
+            list[i].style.color = colors[cs[i]];
+            list[i].sIndex = ws[i];
+        }
+    }
+    listChange();
+
+    var flag = false;
+    for (var i = 0; i < list.length; i++) {
+        list[i].onclick = function () {
+            //正确
+            if (this.sIndex == colorIndex && times != 0) {
+                showChange();
+                listChange();
+                flag = true;
+                scores++;
+                score.innerHTML = scores;
+            }
+        }
+    }
+    
+    timer = setInterval(function () {
+        if (flag) {
+            if (times == 0) {
+                flag = false;
+                alert('Game Over !\nScores：' + scores);
+            } else {
+                times--;
+                time.innerHTML = times;
+            }
+        }
+    }, 1000);
+    function restart() {
+        times = 60;
+        scores = 0;
+        showChange();
+        listChange();
+        flag = false;
+        time.innerHTML = '60';
+        score.innerHTML = '0';
+    }
+</script>
+</body>
+</html>
