@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>3d照片墙</title>
+	<meta charset="utf-8">
+	<style type="text/css">
+		*{
+			margin: 0;
+			padding: 0;
+		}
+		body{
+			background: #222;
+			overflow: hidden;
+			user-select:none; /*禁止选中*/
+		}
+		.perspective{
+			perspective:800px;/*3d景深*/
+		}
+		.wrap{
+
+			transform-style: preserve-3d;
+			width: 120px;
+			height: 180px;
+			margin: 100px auto;
+			position: relative;
+			transform: rotateX(-10deg) rotateY(0deg);
+		}
+		.wrap img{
+			display: block;
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			transform: rotateY(0deg) translateZ(0px);
+			padding: 10px;
+			background: transparent;/*透明色*/
+			box-shadow: 0 0 4px #fff; /*盒子的阴影 ：水平位移 垂直位移 扩散程度 颜色*/
+			border-radius: 5px;
+			/*倒影*/
+			-webkit-box-reflect:below 5px -webkit-linear-gradient(top,rgba(0,0,0,0) 40%,rgba(0,0,0,0.5) 100%);
+		}
+		.wrap p{
+			width: 1200px;
+			height: 1200px;
+			background: -webkit-radial-gradient(center center,600px 600px,rgba(122,122,122,0.5),rgba(0,0,0,0));
+			/*从中心开始向外扩散，半径为600  ，颜色从白色渐变为黑色*/
+			position: absolute;
+			border-radius: 50%;
+			left: 50%;
+			top:100%;
+			margin-left: -600px;
+			margin-top: -600px;
+			transform: rotateX(90deg);/*沿着x轴方向摁倒*/
+		}
+	</style>
+</head>
+<body>
+<div class="perspective">
+	<div class="wrap">
+		<img src="images/12.jpg" width="133" height="200" alt="#">
+		<img src="images/1.jpg" width="133" height="200" alt="#">
+		<img src="images/3.jpg" width="133" height="200" alt="#">
+		<img src="images/4.jpg" width="133" height="200" alt="#">
+		<img src="images/5.jpg" width="133" height="200" alt="#">
+		<img src="images/6.jpg" width="133" height="200" alt="#">
+		<img src="images/7.jpg" width="133" height="200" alt="#">
+		<img src="images/8.jpg" width="133" height="200" alt="#">
+		<img src="images/9.jpg" width="133" height="200" alt="#">
+		<img src="images/10.jpg" width="133" height="200" alt="#">
+		<img src="images/11.jpg" width="133" height="200" alt="#">
+		<p></p>
+	</div>
+</div>
+<script type="text/javascript">
+	window.onload=function(){
+		var oImg=document.querySelectorAll('img');//万能选择器 最新的获取元素方法
+		var oWrap=document.querySelector('.wrap');
+		var lastX,lastY,nowX,nowY,minuX,minuY,rotX=-10,rotY=0;
+		var timer=null;
+		var length=oImg.length;//  获取数量
+		var Deg=360/length;
+		for(var i=0;i<length;i++){
+			oImg[i].style.transform='rotateY('+ i*Deg +'deg) translateZ(350px)';
+			oImg[i].style.transition='transform 1s '+(length-1-i)*0.2+'s';
+		}
+		//封装一个函数，使元素居中
+		mTop();
+		window.onresize=mTop;
+			function mTop(){
+				var wH=document.documentElement.clientHeight||document.body.clientHeight; // 兼容性 获取浏览器窗口可视高度
+				oWrap.style.marginTop=(wH/2)-oWrap.offsetHeight+"px";
+			}
+			//拖拽步骤：按下（onmousedown) 移动(onmousemove) 抬起(onmouseup)
+			document.onmousedown=function(event){
+				event=event||window.event;//处理兼容性
+				lastX=event.clientX;  //鼠标拖拽开始时的x坐标
+				lastY=event.clientY;  //鼠标拖拽开始时的y坐标
+				clearInterval(timer);
+				document.onmousemove=function(event){
+				 event=event||window.event;//处理兼容性
+				 nowX=event.clientX;  //鼠标拖拽移动时的x坐标
+				 nowY=event.clientY;  //鼠标拖拽移动时的y坐标
+				 minuX=nowX-lastX;
+				 minuY=nowY-lastY;//获取鼠标移动距离
+				 rotY += minuX*0.2; //通过移动量计算旋转角度
+				 rotX -= minuY*0.1;
+				 oWrap.style.transform='rotateX('+rotX+'deg) rotateY('+rotY+'deg)';
+				 lastX=nowX;//更新初始位置，跟得上鼠标
+				 lastY=nowY;
+				}
+				document.onmouseup=function(){
+					document.onmousemove=null;
+					timer=setInterval(function(){
+						minuX*=0.9;  //给一个摩擦系数，每一次定时器触发都慢一点点
+						minuY*=0.9;
+						 rotY += minuX*0.2; //通过移动量计算旋转角度
+						 rotX -= minuY*0.1;
+				 		 oWrap.style.transform='rotateX('+rotX+'deg) rotateY('+rotY+'deg)';
+				 		 if (Math.abs(minuX)<0.1&&Math.abs(minuY)<0.1) {
+				 		 	clearInterval(timer);//当移动量过小时停止惯性
+				 		 }
+					},13);
+				}
+				return false;
+			}
+	}
+</script>
+</body>
+</html>
